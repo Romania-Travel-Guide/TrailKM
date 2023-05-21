@@ -11,7 +11,7 @@
 # Number of kilometers: 239892.3
 # Total duration: 1664 days, 9:40
 #####################################################################
-# Version: 0.0.1
+# Version: 0.1.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -43,6 +43,10 @@ except Exception as err:
 
 OA_PROJECT = config["Outdooractive"]["Project"]
 OA_KEY = config["Outdooractive"]["API"]
+try:
+    OA_AREA = config["Outdooractive"]["Region"]
+except:
+    OA_AREA = 0 
 
 log.basicConfig(
     filename=config["Log"]["File"],
@@ -83,6 +87,9 @@ def get_region_data():
         + "?key="
         + OA_KEY
     )
+    if (OA_AREA != 0):
+        url = url + "&area="+OA_AREA
+
     log.debug("Get region URL:" + url)
     region_xml = xmltodict.parse(session.get(url).text)
     trails=region_xml["datalist"]["data"]
@@ -111,7 +118,12 @@ def read_trail_data(trail):
         + "&lang=ro"
     )
     log.debug("Condition URL:" + url)
-    trail_xml = xmltodict.parse(session.get(url).text)
+
+    try:
+        trail_xml = xmltodict.parse(session.get(url).text)
+    except:
+        print("ERROR")
+
     try:
         duration_minutes = trail_xml["oois"]["tour"]["time"]["@min"]
     except:
@@ -130,8 +142,8 @@ def read_trail_data(trail):
 def main():
     get_region_data()
     print("Number of trails: %d" % number_of_trails)
-    print("Number of kilometers: %.1f" % total_length_meters/1000)
-    print("Total duration: %d" % str(timedelta(minutes=total_duration_minutes))[:-3])
+    print("Number of kilometers: %.1f" % int(total_length_meters/1000))
+    print("Total duration: %s" % str(timedelta(minutes=total_duration_minutes))[:-3])
     
 
 if __name__ == "__main__":

@@ -27,3 +27,5 @@ Execute=Delay
 [Outdooractive]
 Project=<YOUR_PROJECT>
 API=<YOUR_API_KEY>
+# Filter for Areas (Region) in your map
+Region=<YOUR_REGION> # if you set Region to 0, the API call will return return all objects you have access to via API
