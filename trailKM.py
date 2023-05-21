@@ -1,6 +1,6 @@
 #####################################################################
 # trailKM 
-# 1. Determine hom may km of trails do you have in your region
+# 1. Determine how may km of trails do you have in your region
 #
 # Prerequisite:
 #  API access for Outdooractive, see 
