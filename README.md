@@ -32,7 +32,7 @@ To use the `trailKM.py` script, follow these steps:
 
 1. Rename the file (`config.example`) to (`config.ini`) and open it in a text editor.
 
-2. Replace `<YOUR_API_KEY>` with your Outdooractive API key and <YOUR-PROJECT> with your Outdooractive project name. 
+2. Replace `<YOUR_API_KEY>` with your Outdooractive API key and `<YOUR-PROJECT>` with your Outdooractive project name. 
   
 3. Save the changes.
 

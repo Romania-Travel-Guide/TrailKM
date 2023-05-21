@@ -1,0 +1,29 @@
+#
+# Configuration file for trailKM.py
+#
+
+# To do:
+# Rename config.example to config.ini and replace the <YOUR_API_KEY> and <YOUR_PROJECT> with your own
+
+[Log]
+File=trailKM.log
+# Existing logging levels: CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET
+Level=DEBUG
+
+# Only relevant if Execute=Delay
+# Time unit: second
+[Wait]
+Min=1
+Max=3
+
+[Action]
+Execute=Delay               
+# Possible selection: Delay (recommended) or Now
+
+
+# Mandatory: Add here the Outdooractive API. 
+# Before usage, read the quidelines: http://developers.outdooractive.com/Overview/Guidelines.html
+# and Outdooractive Terms and Conditions that are described in the Guidelines.
+[Outdooractive]
+Project=<YOUR_PROJECT>
+API=<YOUR_API_KEY>
