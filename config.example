@@ -24,8 +24,13 @@ Execute=Delay
 # Mandatory: Add here the Outdooractive API. 
 # Before usage, read the quidelines: http://developers.outdooractive.com/Overview/Guidelines.html
 # and Outdooractive Terms and Conditions that are described in the Guidelines.
-[Outdooractive]
-Project=<YOUR_PROJECT>
-API=<YOUR_API_KEY>
+[[Interface]
+OUTDOORACTIVE_PROJECT=<YOUR_PROJECT>
+OUTDOORACTIVE_API==<YOUR_API_KEY>
 # Filter for Areas (Region) in your map
-Region=<YOUR_REGION> # if you set Region to 0, the API call will return return all objects you have access to via API
+OUTDOORACTIVE_REGION=<YOUR_REGION> # if you set Region to 0, the API call will return return all objects you have access to via API
+
+# For trailKM_supabase you have to fill out the SUPABASE parameters too
+SUPABASE_URL = 'YOUR_SUPABASE_URL'
+SUPABASE_KEY = 'YOUR_SUPABASE_KEY'
+

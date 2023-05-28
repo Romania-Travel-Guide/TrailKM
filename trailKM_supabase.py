@@ -1,17 +1,32 @@
 #####################################################################
-# trailKM
-# 1. Determine how may km of trails do you have in your region
+# trailKM_supabase
+# based on trail_KM, it stores trail statistic data in supabase
+#
+# Trails:
+#    region varchar
+#    name varchar
+#    category varchar
+#    distance numeric
+#    duration time
+#    difficulty varchar
+#    ranking numeric
+#    author varchar
+#    trail_id numeric
+#
+# DailyStats:
+#    date date
+#    region varchar
+#    total_trails bigint
+#    total_distance numeric
+#    total_duraction numeric
+#    region varchar
 #
 # Prerequisite:
 #  API access for Outdooractive, see
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
-# OUTOPUT Example:
-# Number of trails: 2978
-# Number of kilometers: 239892.3
-# Total duration: 1664 days, 9:40
 #####################################################################
-# Version: 0.1.2
+# Version: 0.1.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -21,17 +36,20 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import datetime
-from datetime import timedelta
+from datetime import timedelta, date
 import logging as log
 import os
 from random import randint
 import time
 import xmltodict
+import supabase
 
 # global variables
 number_of_trails = 0
 total_duration_minutes = 0
 total_length_meters = 0
+# Get today's date
+today = date.today()
 
 
 # Read initialization parameters
@@ -47,6 +65,8 @@ try:
     OA_AREA = config["Interface"]["OUTDOORACTIVE_REGION"]
 except:
     OA_AREA = 0
+SUPABASE_URL = config["Interface"]["SUPABASE_URL"]
+SUPABASE_KEY = config["Interface"]["SUPABASE_KEY"]
 
 log.basicConfig(
     filename=config["Log"]["File"],
@@ -57,12 +77,14 @@ log.basicConfig(
 
 # Improve https connection handling, see article:
 # https://stackoverflow.com/questions/23013220/max-retries-exceeded-with-url-in-requests
-#
 session = requests.Session()
 retry = Retry(connect=3, backoff_factor=0.5)
 adapter = HTTPAdapter(max_retries=retry)
 session.mount("http://", adapter)
 session.mount("https://", adapter)
+
+# Initialize Supabase client
+supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 #
@@ -138,12 +160,74 @@ def read_trail_data(trail):
     total_duration_minutes = total_duration_minutes + int(duration_minutes)
     total_length_meters = total_length_meters + float(length_meters)
 
+    if OA_AREA == 0:
+        data = {
+            "distance": length_meters,
+            "duration": duration_minutes,
+            "ranking": trail_xml["oois"]["tour"]["@ranking"],
+            "trail_id": trail_xml["oois"]["tour"]["@id"],
+            "author": trail_xml["oois"]["tour"]["meta"]["authorFull"]["name"],
+            "difficulty": trail_xml["oois"]["tour"]["rating"]["@difficulty"],
+            "category": trail_xml["oois"]["tour"]["category"]["@id"],
+            "region": str(OA_AREA),
+        }
+        response = (
+            supabase_client.table("Trails")
+            .select("*")
+            .eq("trail_id", trail_xml["oois"]["tour"]["@id"])
+            .execute()
+        )
+        if len(response.data) > 0:
+            print("Updating data - not implemented")
+            # response = (
+            #     supabase_client.table("Trails")
+            #     .update(data)
+            #     .eq("date", trail_xml["oois"]["tour"]["@id"])
+            #     .execute()
+            # )
+            # check_operation_result(response, "Trails", "update")
+        else:
+            print("Insering data")
+            response = supabase_client.table("Trails").insert(data).execute()
+            check_operation_result(response, "Trails", "insert")
+
 
 def main():
+    global SUPABASE_URL, SUPABASE_KEY, OA_AREA, today
+
     get_region_data()
-    print("Number of trails: %d" % number_of_trails)
-    print("Number of kilometers: %.1f" % int(total_length_meters / 1000))
-    print("Total duration: %s" % str(timedelta(minutes=total_duration_minutes))[:-3])
+    # Prepare the data to be inserted
+    data = {
+        "date": today.isoformat(),
+        "total_trails": number_of_trails,
+        "total_distance": int(total_length_meters / 1000),
+        "total_duration": str(timedelta(minutes=total_duration_minutes)),
+        "region": str(OA_AREA),
+    }
+    response = (
+        supabase_client.table("DailyStats").select("*").eq("date", "today").execute()
+    )
+    if len(response.data) > 0:
+        print("Updating data")
+        response = (
+            supabase_client.table("DailyStats")
+            .update(data)
+            .eq("date", "today")
+            .execute()
+        )
+        check_operation_result(response, "Daily trail statistics", "update")
+    else:
+        print("Insering data")
+        response = supabase_client.table("DailyStats").insert(data).execute()
+        check_operation_result(response, "Daily trail statistics", "insert")
+
+
+def check_operation_result(response, entity_name, operation):
+    if len(response.data) > 0:
+        print(f"{entity_name} {operation}ed successfully.")
+    else:
+        print(f"Failed to {operation} {entity_name}.")
+        print(f"Error: {response.error}")
 
 
 if __name__ == "__main__":
