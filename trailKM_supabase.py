@@ -1,6 +1,8 @@
 #####################################################################
-# trailKM_supabase
-# based on trail_KM, it stores trail statistic data in supabase
+# Call:
+# python trailKM_supabase <ini_file.ini>
+#   ini_file.ini - is optional, by default it is config.ini
+# Based on trailKM, the script stores trail statistic data in supabase
 #
 # Trails:
 #    region varchar
@@ -27,7 +29,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.2.0
+# Version: 0.2.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -62,7 +64,7 @@ print("Config file: " + config_file)
 # Read initialization parameters
 config = configparser.ConfigParser()
 try:
-    config.read("config_file)
+    config.read(config_file)
 except Exception as err:
     print("Cannot read INI file due to Error: %s" % (str(err)))
 
