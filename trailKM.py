@@ -11,7 +11,7 @@
 # Number of kilometers: 239892.3
 # Total duration: 1664 days, 9:40
 #####################################################################
-# Version: 0.1.2
+# Version: 0.2.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -27,17 +27,22 @@ import os
 from random import randint
 import time
 import xmltodict
+import sys
 
 # global variables
 number_of_trails = 0
 total_duration_minutes = 0
 total_length_meters = 0
 
+try:
+    config_file = sys.argv[1]
+except:
+    config_file = "config.ini"
 
 # Read initialization parameters
 config = configparser.ConfigParser()
 try:
-    config.read("config.ini")
+    config.read(config_file)
 except Exception as err:
     print("Cannot read INI file due to Error: %s" % (str(err)))
 
