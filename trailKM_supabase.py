@@ -29,7 +29,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.2.1
+# Version: 0.3.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -253,7 +253,8 @@ def set_new_to_false():
 def main():
     global SUPABASE_URL, SUPABASE_KEY, OA_AREA, today
 
-    set_new_to_false()
+    # Do not reset new trails
+    # set_new_to_false()
     get_region_data()
     # Prepare the data to be inserted
     data = {
