@@ -29,7 +29,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.3.0
+# Version: 0.3.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -265,14 +265,15 @@ def main():
         "region": str(OA_AREA),
     }
     response = (
-        supabase_client.table("DailyStats").select("*").eq("date", "today").execute()
+        supabase_client.table("DailyStats").select("*").eq("date", today).eq("region", OA_AREA).execute()
     )
     if len(response.data) > 0:
         print("Updating data")
         response = (
             supabase_client.table("DailyStats")
             .update(data)
-            .eq("date", "today")
+            .eq("date", today)
+            .eq("region", OA_AREA)
             .execute()
         )
         check_operation_result(response, "Daily trail statistics", "update")
