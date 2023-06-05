@@ -29,7 +29,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.3.1
+# Version: 0.4.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -156,6 +156,7 @@ def read_trail_data(trail):
         + "&lang=ro"
     )
     log.debug("Condition URL:" + url)
+    print(url)
 
     try:
         trail_xml = xmltodict.parse(session.get(url).text)
@@ -164,6 +165,21 @@ def read_trail_data(trail):
         print("ERROR:", e)
         log.error(e)
         return
+
+    trail_name = ""
+    try:
+        trail_name = trail_xml["oois"]["tour"]["title"]
+    except KeyError:
+        pass
+
+    lang = ""
+    try:
+        if isinstance(trail_xml["oois"]["tour"]["localizedTitle"], list):
+            lang = trail_xml["oois"]["tour"]["localizedTitle"][0]["@lang"]
+        else:
+            lang = trail_xml["oois"]["tour"]["localizedTitle"]["@lang"]
+    except KeyError:
+        pass
 
     duration_minutes = 0
     try:
@@ -195,6 +211,12 @@ def read_trail_data(trail):
     except KeyError:
         author = ""
 
+    author_id = 0
+    try:
+        author_id = trail_xml["oois"]["tour"]["meta"]["authorFull"]["id"]
+    except KeyError:
+        author_id = 0
+
     difficulty = 0
     try:
         difficulty = trail_xml["oois"]["tour"]["rating"]["@difficulty"]
@@ -207,19 +229,43 @@ def read_trail_data(trail):
     except KeyError:
         pass
 
+    date_created = ""
+    try:
+        date_created = trail_xml["oois"]["tour"]["meta"]["date"]["@created"]
+    except KeyError:
+        pass
+
+    date_lastModified = ""
+    try:
+        date_lastModified = trail_xml["oois"]["tour"]["meta"]["date"]["@lastModified"]
+    except KeyError:
+        pass
+
+    date_firstPublish = ""
+    try:
+        date_firstPublish = trail_xml["oois"]["tour"]["meta"]["date"]["@firstPublish"]
+    except KeyError:
+        pass
+
     total_duration_minutes = total_duration_minutes + int(duration_minutes)
     total_length_meters = total_length_meters + float(length_meters)
 
     if OA_AREA == 0:
         data = {
+            "name": trail_name,
+            "lang": lang,
             "distance": length_meters,
             "duration": duration_minutes,
             "ranking": ranking,
             "trail_id": trail_id,
             "author": author,
+            "author_id": author_id,
             "difficulty": difficulty,
             "category": category,
             "region": str(OA_AREA),
+            "date_created": date_created,
+            "date_lastModified": date_lastModified,
+            "date_firstPublish": date_firstPublish,
             "new": True,
         }
         response = (
@@ -265,7 +311,11 @@ def main():
         "region": str(OA_AREA),
     }
     response = (
-        supabase_client.table("DailyStats").select("*").eq("date", today).eq("region", OA_AREA).execute()
+        supabase_client.table("DailyStats")
+        .select("*")
+        .eq("date", today)
+        .eq("region", OA_AREA)
+        .execute()
     )
     if len(response.data) > 0:
         print("Updating data")
