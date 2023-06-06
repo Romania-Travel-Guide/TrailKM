@@ -29,7 +29,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.4.0
+# Version: 0.4.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -123,7 +123,14 @@ def get_region_data():
         url = url + "&area=" + OA_AREA
 
     log.debug("Get region URL:" + url)
-    region_xml = xmltodict.parse(session.get(url).text)
+    try:
+        region_xml = xmltodict.parse(session.get(url).text)
+
+    except Exception as e:
+        print("ERROR:", e)
+        log.error(e)
+        return
+
     trails = region_xml["datalist"]["data"]
     number_of_trails = len(trails)
 
@@ -299,6 +306,11 @@ def set_new_to_false():
 def main():
     global SUPABASE_URL, SUPABASE_KEY, OA_AREA, today
 
+    log.info("===============================")
+    log.info(
+        "Program start: " + str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M"))
+    )
+    log.info("===============================")
     # Do not reset new trails
     # set_new_to_false()
     get_region_data()
