@@ -29,7 +29,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.4.1
+# Version: 0.5.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -146,154 +146,148 @@ def read_trail_data(trail):
     global total_duration_minutes
     global total_length_meters
 
-    # response = (
-    #     supabase_client.table("Trails").select("*").eq("trail_id", trail).execute()
-    # )
-    # if len(response.data) > 0:
-    #     print("UPDATE NOT IMPLEMENTED")
-    # else:
-    wait()
-    url = (
-        "https://www.outdooractive.com/api/project/"
-        + OA_PROJECT
-        + "/oois/"
-        + str(trail)
-        + "?key="
-        + OA_KEY
-        + "&lang=ro"
+    # Query supabase to check if trail is already saved
+    response = (
+        supabase_client.table("Trails").select("*").eq("trail_id", trail).execute()
     )
-    log.debug("Condition URL:" + url)
-    print(url)
+    if len(response.data) > 0:
+        # Trail already in database
+        duration_minutes = response.data[0]["duration"]
+        length_meters = response.data[0]["distance"]
+    else:
+        # New trail, has to be recoreded in database
+        wait()
+        url = (
+            "https://www.outdooractive.com/api/project/"
+            + OA_PROJECT
+            + "/oois/"
+            + str(trail)
+            + "?key="
+            + OA_KEY
+            + "&lang=ro"
+        )
+        log.debug("Condition URL:" + url)
+        print(url)
 
-    try:
-        trail_xml = xmltodict.parse(session.get(url).text)
+        try:
+            trail_xml = xmltodict.parse(session.get(url).text)
 
-    except Exception as e:
-        print("ERROR:", e)
-        log.error(e)
-        return
+        except Exception as e:
+            print("ERROR:", e)
+            log.error(e)
+            return
+        trail_name = ""
+        try:
+            trail_name = trail_xml["oois"]["tour"]["title"]
+        except KeyError:
+            pass
 
-    trail_name = ""
-    try:
-        trail_name = trail_xml["oois"]["tour"]["title"]
-    except KeyError:
-        pass
-
-    lang = ""
-    try:
-        if isinstance(trail_xml["oois"]["tour"]["localizedTitle"], list):
-            lang = trail_xml["oois"]["tour"]["localizedTitle"][0]["@lang"]
-        else:
-            lang = trail_xml["oois"]["tour"]["localizedTitle"]["@lang"]
-    except KeyError:
-        pass
-
-    duration_minutes = 0
-    try:
-        duration_minutes = trail_xml["oois"]["tour"]["time"]["@min"]
-    except KeyError:
-        pass
-
-    length_meters = 0
-    try:
-        length_meters = trail_xml["oois"]["tour"]["length"]
-    except KeyError:
-        pass
-
-    ranking = 0
-    try:
-        ranking = trail_xml["oois"]["tour"]["@ranking"]
-    except KeyError:
-        pass
-
-    trail_id = 0
-    try:
-        trail_id = trail_xml["oois"]["tour"]["@id"]
-    except KeyError:
-        pass
-
-    author = ""
-    try:
-        author = trail_xml["oois"]["tour"]["meta"]["authorFull"]["name"]
-    except KeyError:
+        lang = ""
+        try:
+            if isinstance(trail_xml["oois"]["tour"]["localizedTitle"], list):
+                lang = trail_xml["oois"]["tour"]["localizedTitle"][0]["@lang"]
+            else:
+                lang = trail_xml["oois"]["tour"]["localizedTitle"]["@lang"]
+        except KeyError:
+            pass
+        duration_minutes = 0
+        try:
+            duration_minutes = trail_xml["oois"]["tour"]["time"]["@min"]
+        except KeyError:
+            pass
+        length_meters = 0
+        try:
+            length_meters = trail_xml["oois"]["tour"]["length"]
+        except KeyError:
+            pass
+        ranking = 0
+        try:
+            ranking = trail_xml["oois"]["tour"]["@ranking"]
+        except KeyError:
+            pass
+        trail_id = 0
+        try:
+            trail_id = trail_xml["oois"]["tour"]["@id"]
+        except KeyError:
+            pass
         author = ""
-
-    author_id = 0
-    try:
-        author_id = trail_xml["oois"]["tour"]["meta"]["authorFull"]["id"]
-    except KeyError:
+        try:
+            author = trail_xml["oois"]["tour"]["meta"]["authorFull"]["name"]
+        except KeyError:
+            author = ""
         author_id = 0
-
-    difficulty = 0
-    try:
-        difficulty = trail_xml["oois"]["tour"]["rating"]["@difficulty"]
-    except KeyError:
-        pass
-
-    category = 0
-    try:
-        category = trail_xml["oois"]["tour"]["category"]["@id"]
-    except KeyError:
-        pass
-
-    date_created = ""
-    try:
-        date_created = trail_xml["oois"]["tour"]["meta"]["date"]["@created"]
-    except KeyError:
-        pass
-
-    date_lastModified = ""
-    try:
-        date_lastModified = trail_xml["oois"]["tour"]["meta"]["date"]["@lastModified"]
-    except KeyError:
-        pass
-
-    date_firstPublish = ""
-    try:
-        date_firstPublish = trail_xml["oois"]["tour"]["meta"]["date"]["@firstPublish"]
-    except KeyError:
-        pass
-
+        try:
+            author_id = trail_xml["oois"]["tour"]["meta"]["authorFull"]["id"]
+        except KeyError:
+            author_id = 0
+        difficulty = 0
+        try:
+            difficulty = trail_xml["oois"]["tour"]["rating"]["@difficulty"]
+        except KeyError:
+            pass
+        category = 0
+        try:
+            category = trail_xml["oois"]["tour"]["category"]["@id"]
+        except KeyError:
+            pass
+        date_created = ""
+        try:
+            date_created = trail_xml["oois"]["tour"]["meta"]["date"]["@created"]
+        except KeyError:
+            pass
+        date_lastModified = ""
+        try:
+            date_lastModified = trail_xml["oois"]["tour"]["meta"]["date"][
+                "@lastModified"
+            ]
+        except KeyError:
+            pass
+        date_firstPublish = ""
+        try:
+            date_firstPublish = trail_xml["oois"]["tour"]["meta"]["date"][
+                "@firstPublish"
+            ]
+        except KeyError:
+            pass
+        if OA_AREA == 0:
+            data = {
+                "name": trail_name,
+                "lang": lang,
+                "distance": length_meters,
+                "duration": duration_minutes,
+                "ranking": ranking,
+                "trail_id": trail_id,
+                "author": author,
+                "author_id": author_id,
+                "difficulty": difficulty,
+                "category": category,
+                "region": str(OA_AREA),
+                "date_created": date_created,
+                "date_lastModified": date_lastModified,
+                "date_firstPublish": date_firstPublish,
+                "new": True,
+            }
+            response = (
+                supabase_client.table("Trails")
+                .select("*")
+                .eq("trail_id", trail_xml["oois"]["tour"]["@id"])
+                .execute()
+            )
+            if len(response.data) > 0:
+                print("Updating data - not implemented")
+                # response = (
+                #     supabase_client.table("Trails")
+                #     .update(data)
+                #     .eq("date", trail_xml["oois"]["tour"]["@id"])
+                #     .execute()
+                # )
+                # check_operation_result(response, "Trails", "update")
+            else:
+                print("Insering data")
+                response = supabase_client.table("Trails").insert(data).execute()
+                check_operation_result(response, "Trails", "insert")
     total_duration_minutes = total_duration_minutes + int(duration_minutes)
     total_length_meters = total_length_meters + float(length_meters)
-
-    if OA_AREA == 0:
-        data = {
-            "name": trail_name,
-            "lang": lang,
-            "distance": length_meters,
-            "duration": duration_minutes,
-            "ranking": ranking,
-            "trail_id": trail_id,
-            "author": author,
-            "author_id": author_id,
-            "difficulty": difficulty,
-            "category": category,
-            "region": str(OA_AREA),
-            "date_created": date_created,
-            "date_lastModified": date_lastModified,
-            "date_firstPublish": date_firstPublish,
-            "new": True,
-        }
-        response = (
-            supabase_client.table("Trails")
-            .select("*")
-            .eq("trail_id", trail_xml["oois"]["tour"]["@id"])
-            .execute()
-        )
-        if len(response.data) > 0:
-            print("Updating data - not implemented")
-            # response = (
-            #     supabase_client.table("Trails")
-            #     .update(data)
-            #     .eq("date", trail_xml["oois"]["tour"]["@id"])
-            #     .execute()
-            # )
-            # check_operation_result(response, "Trails", "update")
-        else:
-            print("Insering data")
-            response = supabase_client.table("Trails").insert(data).execute()
-            check_operation_result(response, "Trails", "insert")
 
 
 def set_new_to_false():
