@@ -273,19 +273,9 @@ def read_trail_data(trail):
                 .eq("trail_id", trail_xml["oois"]["tour"]["@id"])
                 .execute()
             )
-            if len(response.data) > 0:
-                print("Updating data - not implemented")
-                # response = (
-                #     supabase_client.table("Trails")
-                #     .update(data)
-                #     .eq("date", trail_xml["oois"]["tour"]["@id"])
-                #     .execute()
-                # )
-                # check_operation_result(response, "Trails", "update")
-            else:
-                print("Insering data")
-                response = supabase_client.table("Trails").insert(data).execute()
-                check_operation_result(response, "Trails", "insert")
+            print("Insering data")
+            response = supabase_client.table("Trails").insert(data).execute()
+            check_operation_result(response, "Trails", "insert")
     total_duration_minutes = total_duration_minutes + int(duration_minutes)
     total_length_meters = total_length_meters + float(length_meters)
 
@@ -325,17 +315,25 @@ def main():
     )
     if len(response.data) > 0:
         print("Updating data")
-        response = (
-            supabase_client.table("DailyStats")
-            .update(data)
-            .eq("date", today)
-            .eq("region", OA_AREA)
-            .execute()
-        )
+        try:
+            response = (
+                supabase_client.table("DailyStats")
+                .update(data)
+                .eq("date", today)
+                .eq("region", OA_AREA)
+                .execute()
+            )
+        except:
+            return
         check_operation_result(response, "Daily trail statistics", "update")
     else:
         print("Insering data")
-        response = supabase_client.table("DailyStats").insert(data).execute()
+        try:
+            response = supabase_client.table("DailyStats").insert(data).execute()
+        except Exception as e:
+            print("ERROR:", e)
+            log.error(e)
+            return
         check_operation_result(response, "Daily trail statistics", "insert")
 
 
