@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.7.0
+# Version: 0.7.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -124,7 +124,6 @@ def get_region_data():
             .eq("trail_id", trail["@id"])
             .execute()
         )
-        data = read_trail_data(trail["@id"])
         if len(response.data) > 0:
             # Trail already in database
             duration_minutes = response.data[0]["duration"]
@@ -134,6 +133,7 @@ def get_region_data():
             if str(response.data[0]["region_name"]) == "None":
                 update_trail_data(data)
         else:
+            data = read_trail_data(trail["@id"])
             insert_trail_data(data)
 
 
