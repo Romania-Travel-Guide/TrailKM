@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.7.1
+# Version: 0.7.2
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -273,7 +273,11 @@ def read_trail_data(trail_id):
         date_firstPublish = trail_xml["oois"]["tour"]["meta"]["date"]["@firstPublish"]
     except KeyError:
         pass
-
+    primaryImage = ""
+    try:
+        primaryImage = trail_xml["oois"]["tour"]["primaryImage"]["@id"]
+    except KeyError:
+        pass
     data = {
         "name": trail_name,
         "lang": lang,
@@ -292,6 +296,7 @@ def read_trail_data(trail_id):
         "region_name": region_name.strip(),
         "district_name": district_name.strip(),
         "customarea": customarea.strip(),
+        "primaryImage": primaryImage,
     }
     return data
 
