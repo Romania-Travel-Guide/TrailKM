@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.1.0
+# Version: 0.1.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -88,6 +88,8 @@ def wait():
 # Return map region type and name based on region id
 #
 def get_region_data():
+    global number_of_pois
+
     url = (
         "https://www.outdooractive.com/api/project/"
         + OA_PROJECT
@@ -124,7 +126,7 @@ def get_region_data():
             # total_length_meters = total_length_meters + float(length_meters)
             # if str(response.data[0]["region_name"]) == "None":
             #     update_trail_data(data)
-            print("POI does exist")
+            print(".", end="")
         else:
             data = read_poi_data(poi["@id"])
             insert_poi_data(data)
