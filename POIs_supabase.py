@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.1.1
+# Version: 0.2.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -142,23 +142,6 @@ def insert_poi_data(data):
         print("ERROR:", e)
         log.error(e)
         return
-
-
-# def update_trail_data(data):
-#     print("Updating trail " + data["trail_id"])
-#     data["new"] = False
-#     try:
-#         response = (
-#             supabase_client.table("Trails")
-#             .update(data)
-#             .eq("trail_id", data["trail_id"])
-#             .execute()
-#         )
-#         check_operation_result(response, "Trails", "update")
-#     except Exception as e:
-#         print("ERROR:", e)
-#         log.error(e)
-#         return
 
 
 #
@@ -298,6 +281,7 @@ def read_poi_data(poi_id):
         "customarea": customarea.strip(),
         "primaryImage": primaryImage,
         "lang": lang,
+        "project": OA_PROJECT,
     }
     return data
 
@@ -331,6 +315,7 @@ def main():
         .select("*")
         .eq("date", today)
         .eq("region", OA_AREA)
+        .eq("project", OA_PROJECT)
         .execute()
     )
     if len(response.data) > 0:
@@ -341,6 +326,7 @@ def main():
                 .update(data)
                 .eq("date", today)
                 .eq("region", OA_AREA)
+                .eq("project", OA_PROJECT)
                 .execute()
             )
         except:

@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.7.2
+# Version: 0.8.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -122,6 +122,7 @@ def get_region_data():
             supabase_client.table("Trails")
             .select("*")
             .eq("trail_id", trail["@id"])
+            .eq("project", OA_PROJECT)
             .execute()
         )
         if len(response.data) > 0:
@@ -157,6 +158,7 @@ def update_trail_data(data):
             supabase_client.table("Trails")
             .update(data)
             .eq("trail_id", data["trail_id"])
+            .eq("project", OA_PROJECT)
             .execute()
         )
         check_operation_result(response, "Trails", "update")
@@ -297,6 +299,7 @@ def read_trail_data(trail_id):
         "district_name": district_name.strip(),
         "customarea": customarea.strip(),
         "primaryImage": primaryImage,
+        "project": OA_PROJECT,
     }
     return data
 
@@ -305,11 +308,17 @@ def set_new_to_false():
     data = {
         "new": False,
     }
-    response = supabase_client.table("Trails").update(data).eq("new", "True").execute()
+    response = (
+        supabase_client.table("Trails")
+        .update(data)
+        .eq("new", "True")
+        .eq("project", OA_PROJECT)
+        .execute()
+    )
 
 
 def main():
-    global SUPABASE_URL, SUPABASE_KEY, OA_AREA, today
+    global SUPABASE_URL, SUPABASE_KEY, OA_AREA, OA_PROJECT, today
 
     log.info("===============================")
     log.info(
@@ -332,6 +341,7 @@ def main():
         .select("*")
         .eq("date", today)
         .eq("region", OA_AREA)
+        .eq("project", OA_PROJECT)
         .execute()
     )
     if len(response.data) > 0:
@@ -342,6 +352,7 @@ def main():
                 .update(data)
                 .eq("date", today)
                 .eq("region", OA_AREA)
+                .eq("project", OA_PROJECT)
                 .execute()
             )
         except:
