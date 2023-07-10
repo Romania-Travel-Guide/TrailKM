@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.8.0
+# Version: 0.8.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -93,6 +93,7 @@ def get_region_data():
     global number_of_trails
     global total_duration_minutes
     global total_length_meters
+    global OA_PROJECT
 
     url = (
         "https://www.outdooractive.com/api/project/"
@@ -151,6 +152,8 @@ def insert_trail_data(data):
 
 
 def update_trail_data(data):
+    global OA_PROJECT
+
     print("Updating trail " + data["trail_id"])
     data["new"] = False
     try:
@@ -174,6 +177,7 @@ def update_trail_data(data):
 def read_trail_data(trail_id):
     global total_duration_minutes
     global total_length_meters
+    global OA_PROJECT
 
     # New trail, has to be recoreded in database
     wait()
@@ -305,6 +309,7 @@ def read_trail_data(trail_id):
 
 
 def set_new_to_false():
+    global OA_PROJECT
     data = {
         "new": False,
     }

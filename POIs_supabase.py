@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.2.0
+# Version: 0.2.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -148,6 +148,7 @@ def insert_poi_data(data):
 # Read the POI parameters via Outdooractive API
 #
 def read_poi_data(poi_id):
+    global OA_PROJECT
     # New trail, has to be recoreded in database
     wait()
     url = (
@@ -290,11 +291,17 @@ def set_new_to_false():
     data = {
         "new": False,
     }
-    response = supabase_client.table("POIs").update(data).eq("new", "True").execute()
+    response = (
+        supabase_client.table("POIs")
+        .update(data)
+        .eq("new", "True")
+        .eq("project", OA_PROJECT)
+        .execute()
+    )
 
 
 def main():
-    global SUPABASE_URL, SUPABASE_KEY, OA_AREA, today
+    global SUPABASE_URL, SUPABASE_KEY, OA_AREA, OA_PROJECT, today
 
     log.info("===============================")
     log.info(
