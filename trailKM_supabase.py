@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.8.1
+# Version: 0.8.2
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -340,6 +340,7 @@ def main():
         "total_distance": int(total_length_meters / 1000),
         "total_duration": str(timedelta(minutes=total_duration_minutes)),
         "region": str(OA_AREA),
+        "project": OA_PROJECT,
     }
     response = (
         supabase_client.table("DailyStats")

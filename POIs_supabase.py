@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.2.1
+# Version: 0.2.2
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -20,13 +20,14 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import datetime
 from datetime import timedelta, date
-import logging as log
 import os
 from random import randint
 import time
 import xmltodict
 import supabase
+import logging as log
 import sys
+
 
 # global variables
 number_of_pois = 0
@@ -55,12 +56,6 @@ except:
 SUPABASE_URL = config["Interface"]["SUPABASE_URL"]
 SUPABASE_KEY = config["Interface"]["SUPABASE_KEY"]
 
-log.basicConfig(
-    filename=config["Log"]["File"],
-    level=os.environ.get("LOGLEVEL", config["Log"]["Level"]),
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S ",
-)
 
 # Improve https connection handling, see article:
 # https://stackoverflow.com/questions/23013220/max-retries-exceeded-with-url-in-requests
@@ -97,6 +92,7 @@ def get_region_data():
         + "?key="
         + OA_KEY
     )
+    print(url)
 
     if OA_AREA != 0:
         url = url + "&area=" + OA_AREA
@@ -303,6 +299,13 @@ def set_new_to_false():
 def main():
     global SUPABASE_URL, SUPABASE_KEY, OA_AREA, OA_PROJECT, today
 
+    log.basicConfig(
+        filename=config["Log"]["File"],
+        level=os.environ.get("LOGLEVEL", config["Log"]["Level"]),
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S ",
+    )
+
     log.info("===============================")
     log.info(
         "Program start: " + str(datetime.datetime.today().strftime("%Y-%m-%d %H:%M"))
@@ -316,6 +319,7 @@ def main():
         "date": today.isoformat(),
         "total_pois": number_of_pois,
         "region": str(OA_AREA),
+        "project": OA_PROJECT,
     }
     response = (
         supabase_client.table("DailyStats")
