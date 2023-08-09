@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.2.1
+# Version: 0.2.2
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -105,7 +105,23 @@ def get_region_conditions():
         log.error(e)
         return
 
-    for condition in region_xm ta)
+    conditions = region_xml["datalist"]["data"]
+    number_of_conditions = len(conditions)
+
+    for condition in conditions:
+        # Query supabase to check if trail is already saved
+        response = (
+            supabase_client.table("Conditions")
+            .select("*")
+            .eq("condition_id", condition["@id"])
+            .execute()
+        )
+        if len(response.data) > 0:
+            # Condition already in database
+            print(".", end="")
+        else:
+            data = read_condition(event["@id"])
+            insert_condition(data)
 
 
 def insert_condition(data):
