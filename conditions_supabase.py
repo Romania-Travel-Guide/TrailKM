@@ -120,7 +120,7 @@ def get_region_conditions():
             # Condition already in database
             print(".", end="")
         else:
-            data = read_condition(event["@id"])
+            data = read_condition(condition["@id"])
             insert_condition(data)
 
 
