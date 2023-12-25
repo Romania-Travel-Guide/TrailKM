@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.8.2
+# Version: 0.8.3
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -56,6 +56,10 @@ except:
     OA_AREA = 0
 SUPABASE_URL = config["Interface"]["SUPABASE_URL"]
 SUPABASE_KEY = config["Interface"]["SUPABASE_KEY"]
+try:
+    SUPABASE_PREFIX = config["Interface"]["SUPABASE_TABLE_PREFIX"]
+except:
+    SUPABASE_PREFIX = ""
 
 log.basicConfig(
     filename=config["Log"]["File"],
@@ -120,7 +124,7 @@ def get_region_data():
     for trail in trails:
         # Query supabase to check if trail is already saved
         response = (
-            supabase_client.table("Trails")
+            supabase_client.table(SUPABASE_PREFIX + "Trails")
             .select("*")
             .eq("trail_id", trail["@id"])
             .eq("project", OA_PROJECT)
@@ -143,7 +147,9 @@ def insert_trail_data(data):
     print("Inserting trail " + data["trail_id"])
     data["new"] = True
     try:
-        response = supabase_client.table("Trails").insert(data).execute()
+        response = (
+            supabase_client.table(SUPABASE_PREFIX + "Trails").insert(data).execute()
+        )
         check_operation_result(response, "Trails", "insert")
     except Exception as e:
         print("ERROR:", e)
@@ -158,7 +164,7 @@ def update_trail_data(data):
     data["new"] = False
     try:
         response = (
-            supabase_client.table("Trails")
+            supabase_client.table(SUPABASE_PREFIX + "Trails")
             .update(data)
             .eq("trail_id", data["trail_id"])
             .eq("project", OA_PROJECT)
@@ -314,7 +320,7 @@ def set_new_to_false():
         "new": False,
     }
     response = (
-        supabase_client.table("Trails")
+        supabase_client.table(SUPABASE_PREFIX + "Trails")
         .update(data)
         .eq("new", "True")
         .eq("project", OA_PROJECT)
@@ -343,7 +349,7 @@ def main():
         "project": OA_PROJECT,
     }
     response = (
-        supabase_client.table("DailyStats")
+        supabase_client.table(SUPABASE_PREFIX + "DailyStats")
         .select("*")
         .eq("date", today)
         .eq("region", OA_AREA)
@@ -354,7 +360,7 @@ def main():
         print("Updating data")
         try:
             response = (
-                supabase_client.table("DailyStats")
+                supabase_client.table(SUPABASE_PREFIX + "DailyStats")
                 .update(data)
                 .eq("date", today)
                 .eq("region", OA_AREA)
@@ -367,7 +373,11 @@ def main():
     else:
         print("Insering data")
         try:
-            response = supabase_client.table("DailyStats").insert(data).execute()
+            response = (
+                supabase_client.table(SUPABASE_PREFIX + "DailyStats")
+                .insert(data)
+                .execute()
+            )
         except Exception as e:
             print("ERROR:", e)
             log.error(e)
