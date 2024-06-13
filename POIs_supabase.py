@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.2.2
+# Version: 0.2.3
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -106,7 +106,12 @@ def get_region_data():
         log.error(e)
         return
 
-    pois = region_xml["datalist"]["data"]
+    # Getting all POIs
+    try:
+        pois = region_xml["datalist"]["data"]
+    except KeyError:
+        pois = {}
+
     number_of_pois = len(pois)
 
     for poi in pois:
@@ -183,17 +188,18 @@ def read_poi_data(poi_id):
     region_name = ""
     district_name = ""
     customarea = ""
-    try:
-        if isinstance(poi_xml["oois"]["poi"]["regions"]["region"], list):
-            for region in poi_xml["oois"]["poi"]["regions"]["region"]:
-                if region["@type"] == "tourismarea":
-                    region_name = region_name + " " + region["@name"]
-                if region["@type"] == "customarea":
-                    customarea = customarea + " " + region["@id"]
-                if region["@type"] == "district":
-                    district_name = district_name + " " + region["@id"]
-    except KeyError:
-        pass
+    if poi_xml["oois"]["poi"]["regions"] is not None:
+        try:
+            if isinstance(poi_xml["oois"]["poi"]["regions"]["region"], list):
+                for region in poi_xml["oois"]["poi"]["regions"]["region"]:
+                    if region["@type"] == "tourismarea":
+                        region_name = region_name + " " + region["@name"]
+                    if region["@type"] == "customarea":
+                        customarea = customarea + " " + region["@id"]
+                    if region["@type"] == "district":
+                        district_name = district_name + " " + region["@id"]
+        except KeyError:
+            pass
 
     ranking = 0
     try:
