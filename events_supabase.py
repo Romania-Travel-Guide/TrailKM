@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.1.0
+# Version: 0.1.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -106,7 +106,12 @@ def get_region_data():
         log.error(e)
         return
 
-    events = region_xml["datalist"]["data"]
+    # Getting all Events
+    try:
+        events = region_xml["datalist"]["data"]
+    except KeyError:
+        events = {}
+
     number_of_events = len(events)
 
     for event in events:
