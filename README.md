@@ -13,12 +13,12 @@ Before running the script, ensure that you have the following:
 
 1. Clone the repository to your local machine using the following command:
    ```shell
-   git clone https://github.com/Clustmart/trailKM.py.git
+   git clone https://github.com/Clustmart/trailKM.git
    ```
 
 2. Navigate to the project directory:
    ```shell
-   cd trailKM.py
+   cd trailKM
    ```
 
 3. Install the required dependencies by executing the following command:
