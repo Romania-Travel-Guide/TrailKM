@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.8.3
+# Version: 0.8.4
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -223,17 +223,19 @@ def read_trail_data(trail_id):
     region_name = ""
     district_name = ""
     customarea = ""
-    try:
-        if isinstance(trail_xml["oois"]["tour"]["regions"]["region"], list):
-            for region in trail_xml["oois"]["tour"]["regions"]["region"]:
-                if region["@type"] == "tourismarea":
-                    region_name = region_name + " " + region["@name"]
-                if region["@type"] == "customarea":
-                    customarea = customarea + " " + region["@id"]
-                if region["@type"] == "district":
-                    district_name = district_name + " " + region["@id"]
-    except KeyError:
-        pass
+
+    if trail_xml["oois"]["tour"]["regions"] is not None:
+        try:
+            if isinstance(trail_xml["oois"]["tour"]["regions"]["region"], list):
+                for region in trail_xml["oois"]["tour"]["regions"]["region"]:
+                    if region["@type"] == "tourismarea":
+                        region_name = region_name + " " + region["@name"]
+                    if region["@type"] == "customarea":
+                        customarea = customarea + " " + region["@id"]
+                    if region["@type"] == "district":
+                        district_name = district_name + " " + region["@id"]
+        except KeyError:
+            pass
 
     duration_minutes = 0
     try:
