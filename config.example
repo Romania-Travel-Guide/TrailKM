@@ -27,6 +27,8 @@ Execute=Delay
 [[Interface]
 OUTDOORACTIVE_PROJECT=<YOUR_PROJECT>
 OUTDOORACTIVE_API==<YOUR_API_KEY>
+OA_LANG=en
+
 # Filter for Areas (Region) in your map
 OUTDOORACTIVE_REGION=<YOUR_REGION> # if you set Region to 0, the API call will return return all objects you have access to via API
 

@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.1.1
+# Version: 0.2.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -49,6 +49,8 @@ except Exception as err:
 
 OA_PROJECT = config["Interface"]["OUTDOORACTIVE_PROJECT"]
 OA_KEY = config["Interface"]["OUTDOORACTIVE_API"]
+OA_LANG = config["Interface"]["OUTDOORACTIVE_LANGUAGE"]
+
 try:
     OA_AREA = config["Interface"]["OUTDOORACTIVE_REGION"]
 except:
@@ -162,7 +164,8 @@ def read_event_data(event_id):
         + str(event_id)
         + "?key="
         + OA_KEY
-        + "&lang=ro"
+        + "&lang="
+        + OA_LANG
     )
     log.debug("Condition URL:" + url)
     print(url)
@@ -179,7 +182,7 @@ def read_event_data(event_id):
     except KeyError:
         pass
 
-    lang = ""
+    lang = OA_LANG
     try:
         if isinstance(event_xml["oois"]["event"]["localizedTitle"], list):
             lang = event_xml["oois"]["event"]["localizedTitle"][0]["@lang"]

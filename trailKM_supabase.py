@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.8.4
+# Version: 0.9.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -50,6 +50,7 @@ except Exception as err:
 
 OA_PROJECT = config["Interface"]["OUTDOORACTIVE_PROJECT"]
 OA_KEY = config["Interface"]["OUTDOORACTIVE_API"]
+OA_LANG = config["Interface"]["OUTDOORACTIVE_LANGUAGE"]
 try:
     OA_AREA = config["Interface"]["OUTDOORACTIVE_REGION"]
 except:
@@ -194,7 +195,8 @@ def read_trail_data(trail_id):
         + str(trail_id)
         + "?key="
         + OA_KEY
-        + "&lang=ro"
+        + "&lang="
+        + OA_LANG
     )
     log.debug("Condition URL:" + url)
     print(url)
@@ -211,7 +213,7 @@ def read_trail_data(trail_id):
     except KeyError:
         pass
 
-    lang = ""
+    lang = OA_LANG
     try:
         if isinstance(trail_xml["oois"]["tour"]["localizedTitle"], list):
             lang = trail_xml["oois"]["tour"]["localizedTitle"][0]["@lang"]
