@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.3.0
+# Version: 0.3.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -283,7 +283,7 @@ def read_condition(condition_id):
     try:
         geometry = condition_xml["oois"]["condition"]["geometry"]
         # Split the string by the comma to get a list of strings
-        lat_str, long_str = geometry.split(",")
+        long_str, lat_str = geometry.split(",")
         # Convert the strings to floats
         lat = float(lat_str)
         long = float(long_str)
@@ -311,10 +311,6 @@ def read_condition(condition_id):
         ]
     except KeyError:
         pass
-    # geometry_description = ""
-    # for record in condition_xml["oois"]["condition"]["regions"]["region"]:
-    #     # print(str(record["@id"]))
-    #     geometry_description = geometry_description + get_region(record)
 
     data = {
         "condition_id": condition_id,
