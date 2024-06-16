@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.2.2
+# Version: 0.3.0
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -282,6 +282,11 @@ def read_condition(condition_id):
     geometry = ""
     try:
         geometry = condition_xml["oois"]["condition"]["geometry"]
+        # Split the string by the comma to get a list of strings
+        lat_str, long_str = geometry.split(",")
+        # Convert the strings to floats
+        lat = float(lat_str)
+        long = float(long_str)
     except KeyError:
         pass
     riskDescription = ""
@@ -328,6 +333,8 @@ def read_condition(condition_id):
         "long_text": longText,
         "winter_activity": winterActivity,
         "geometry": geometry,
+        "lat": lat,
+        "long": long,
         "risk_description": riskDescription,
         "weather_description": weatherDescription,
         # "geometry_description": geometry_description,
