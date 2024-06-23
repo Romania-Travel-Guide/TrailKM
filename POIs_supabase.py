@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.3.0
+# Version: 0.3.1
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -161,7 +161,7 @@ def read_poi_data(poi_id):
         + str(poi_id)
         + "?key="
         + OA_KEY
-        + "&lang"
+        + "&lang="
         + OA_LANG
     )
     log.debug("Condition URL:" + url)
