@@ -9,7 +9,7 @@
 #  http://developers.outdooractive.com/API-Reference/Data-API.html
 #
 #####################################################################
-# Version: 0.3.1
+# Version: 0.3.2
 # Email: paul.wasicsek@gmail.com
 # Status: dev
 #####################################################################
@@ -250,16 +250,19 @@ def read_poi_data(poi_id):
     try:
         date_created = poi_xml["oois"]["poi"]["meta"]["date"]["@created"]
     except KeyError:
+        date_created = None
         pass
     date_lastModified = ""
     try:
         date_lastModified = poi_xml["oois"]["poi"]["meta"]["date"]["@lastModified"]
     except KeyError:
+        date_lastModified = None
         pass
     date_firstPublish = ""
     try:
         date_firstPublish = poi_xml["oois"]["poi"]["meta"]["date"]["@firstPublish"]
     except KeyError:
+        date_firstPublish = None
         pass
     primaryImage = ""
     try:
